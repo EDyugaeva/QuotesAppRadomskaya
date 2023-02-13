@@ -1,0 +1,29 @@
+version: '3'
+services:
+  gateway:
+    image: iuriiradomskii/gateway
+    build: gateway
+    ports:
+      - "8090:8090/tcp"
+    depends_on:
+      - service1
+      - service2
+      - service3
+
+  service1:
+    image: iuriiradomskii/service1
+    build: gateway
+    ports:
+      - "8081:8081/tcp"
+
+  service2:
+    image: iuriiradomskii/service2
+    build: gateway
+    ports:
+      - "8082:8082/tcp"
+
+  service3:
+    image: iuriiradomskii/service3
+    build: gateway
+    ports:
+      - "8083:8083/tcp"
