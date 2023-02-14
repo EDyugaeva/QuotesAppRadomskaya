@@ -1,4 +1,4 @@
-package com.example.userservice.model;
+package com.example.userservice.model.exceptions;
 
 public class NoSuchEntityException extends RuntimeException{
     public NoSuchEntityException(String message) {

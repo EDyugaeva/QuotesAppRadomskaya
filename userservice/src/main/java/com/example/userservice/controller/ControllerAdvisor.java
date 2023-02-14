@@ -1,13 +1,12 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.model.ErrorResponse;
-import com.example.userservice.model.NoSuchEntityException;
+import com.example.userservice.model.exceptions.ErrorResponse;
+import com.example.userservice.model.exceptions.NoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-//import org.webjars.NotFoundException;
 
 import java.util.NoSuchElementException;
 
