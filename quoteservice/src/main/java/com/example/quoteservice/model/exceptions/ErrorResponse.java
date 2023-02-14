@@ -1,4 +1,4 @@
-package com.example.quoteservice.model;
+package com.example.quoteservice.model.exceptions;
 
 
 import lombok.AllArgsConstructor;

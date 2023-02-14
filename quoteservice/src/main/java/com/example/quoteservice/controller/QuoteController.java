@@ -1,13 +1,15 @@
 package com.example.quoteservice.controller;
 
-import com.example.quoteservice.model.Quote;
+import com.example.quoteservice.model.dto.QuoteDto;
 import com.example.quoteservice.services.QuoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/**
+ * Controller to interact with quotes (get, post, put, delete)
+ */
 @RestController
 @RequestMapping(path = "/quote")
 @Slf4j
@@ -26,28 +28,28 @@ public class QuoteController {
 
 
     @PostMapping
-    public Quote createQuote(@RequestParam String content,
-                             @RequestParam Long id) {
+    public QuoteDto createQuote(@RequestParam String content,
+                                @RequestParam Long id) {
         log.info("Creating quotes");
         return quoteService.createQuote(content, id);
 
     }
 
     @GetMapping
-    public Quote getQuote(@RequestParam Long id) {
+    public QuoteDto getQuote(@RequestParam Long id) {
         log.info("Getting  quotes");
         return quoteService.getQuote(id);
     }
 
     @GetMapping(path = "/random")
-    public Quote getRandomQuote() {
+    public QuoteDto getRandomQuote() {
         log.info("Getting random quotes");
         return quoteService.getRandomQuote();
 
     }
 
     @PutMapping
-    public Quote changeQuote(@RequestParam String content,
+    public QuoteDto changeQuote(@RequestParam String content,
                              @RequestParam Long quoteId,
                              @RequestParam Long userId) {
         return quoteService.changeQuote(content, quoteId, userId);
@@ -59,18 +61,13 @@ public class QuoteController {
         quoteService.deleteQuote(quoteId, userId);
     }
 
-    @GetMapping(path = "/information")
-    public String getAllInformationAboutQuote(@RequestParam Long quoteId) {
-        return quoteService.getInformation(quoteId);
-    }
-
     @GetMapping(path = "/best")
-    public List<Quote> getBestQuotes() {
+    public List<QuoteDto> getBestQuotes() {
         return quoteService.getBestQuotes();
     }
 
     @GetMapping(path = "/worst")
-    public List<Quote> getWorstQuotes() {
+    public List<QuoteDto> getWorstQuotes() {
         return quoteService.getWorstQuotes();
     }
 

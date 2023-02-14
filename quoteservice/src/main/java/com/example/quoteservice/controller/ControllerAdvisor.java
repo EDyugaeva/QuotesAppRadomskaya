@@ -1,8 +1,8 @@
 package com.example.quoteservice.controller;
 
-import com.example.quoteservice.model.ErrorResponse;
-import com.example.quoteservice.model.NoSuchEntityException;
-import com.example.quoteservice.model.UserDataBaseException;
+import com.example.quoteservice.model.exceptions.ErrorResponse;
+import com.example.quoteservice.model.exceptions.NoSuchEntityException;
+import com.example.quoteservice.model.exceptions.UserDataBaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

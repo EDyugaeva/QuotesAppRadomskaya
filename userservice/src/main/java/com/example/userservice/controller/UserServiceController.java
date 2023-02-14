@@ -22,30 +22,30 @@ public class UserServiceController {
     }
 
     @PutMapping(path = "setQuote")
-    public String putQuote(@RequestParam Long userId,
+    public void putQuote(@RequestParam Long userId,
                            @RequestParam Long quoteId) {
         log.info("Try to set quote id {} to user with id {} ", quoteId, userId);
-        return userAccountService.setQuotes(userId, quoteId);
+        userAccountService.setQuotes(userId, quoteId);
     }
 
     @PutMapping(path = "deleteQuote")
-    public String deleteQuote(@RequestParam Long userId,
+    public void deleteQuote(@RequestParam Long userId,
                               @RequestParam Long quoteId) {
         log.info("Try to delete quote id {} from user with id {} ", quoteId, userId);
-        return userAccountService.deleteQuoteFromUser(userId, quoteId);
+        userAccountService.deleteQuoteFromUser(userId, quoteId);
     }
 
     @PutMapping(path = "setVote")
-    public String putVote(@RequestParam Long userId,
+    public void putVote(@RequestParam Long userId,
                            @RequestParam Long voteId) {
         log.info("Try to set vote id {} to user with id {} ", voteId, userId);
-        return userAccountService.setVoteToUser(userId, voteId);
+       userAccountService.setVoteToUser(userId, voteId);
     }
 
     @PutMapping(path = "deleteVote")
-    public String deleteVote(@RequestParam Long userId,
+    public void deleteVote(@RequestParam Long userId,
                               @RequestParam Long voteId) {
         log.info("Try to delete vote id {} from user with id {} ", voteId, userId);
-        return userAccountService.deleteVoteFromUser(userId, voteId);
+        userAccountService.deleteVoteFromUser(userId, voteId);
     }
 }

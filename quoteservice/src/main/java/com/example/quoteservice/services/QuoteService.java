@@ -1,27 +1,26 @@
 package com.example.quoteservice.services;
 
 
-import com.example.quoteservice.model.Quote;
+import com.example.quoteservice.model.dto.QuoteDto;
 
 import java.util.List;
 
 public interface QuoteService {
 
-    Quote createQuote(String content, Long userId);
+    QuoteDto createQuote(String content, Long userId);
     void deleteQuote(Long quoteId, Long userId);
-    Quote getQuote(Long id);
-    Quote getRandomQuote();
+    QuoteDto getQuote(Long id);
+    QuoteDto getRandomQuote();
 
-    Quote changeQuote(String content, Long quoteId, Long userId);
+    QuoteDto changeQuote(String content, Long quoteId, Long userId);
 
 
-    String deleteVoteFromQuote(Long quoteId, Long voteId);
+    void deleteVoteFromQuote(Long quoteId, Long voteId);
 
-    String setVoteToQuote(Long quoteId, Long voteId);
+    void setVoteToQuote(Long quoteId, Long voteId);
 
-    String getInformation(Long quoteId);
 
-    List<Quote> getWorstQuotes();
+    List<QuoteDto> getWorstQuotes();
 
-    List<Quote> getBestQuotes();
+    List<QuoteDto> getBestQuotes();
 }

@@ -1,4 +1,4 @@
-package com.example.quoteservice.model;
+package com.example.quoteservice.model.exceptions;
 
 public class NoSuchEntityException extends RuntimeException{
     public NoSuchEntityException(String message) {

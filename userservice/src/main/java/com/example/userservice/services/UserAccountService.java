@@ -8,12 +8,12 @@ public interface UserAccountService {
 
     UserDto getUser(Long id);
 
-    String setQuotes(Long userId, Long quoteId);
-    String deleteQuoteFromUser(Long userId, Long quoteId);
+    void setQuotes(Long userId, Long quoteId);
+    void deleteQuoteFromUser(Long userId, Long quoteId);
 
-    String deleteVoteFromUser(Long userId, Long voteId);
+    void deleteVoteFromUser(Long userId, Long voteId);
 
-    String setVoteToUser(Long userId, Long voteId);
+    void setVoteToUser(Long userId, Long voteId);
 
 
 }
