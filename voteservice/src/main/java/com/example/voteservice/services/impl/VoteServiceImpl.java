@@ -11,6 +11,7 @@ import com.example.voteservice.model.mappers.VoteResultMapper;
 import com.example.voteservice.repository.VoteRepository;
 import com.example.voteservice.services.VoteService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,12 @@ public class VoteServiceImpl implements VoteService {
     private final VoteResultMapper voteResultMapper;
 
     private final VoteMapper voteMapper;
-    //TODO change localhost to constant
 
-    private final String HOST_NAME_USER = "http://localhost:8081/service/";
-    private final String HOST_NAME_QUOTE = "http://localhost:8082/service/";
+    @Value("${host.userservice}")
+    private String USER_HOST;
 
+    @Value("${host.quoteservice}")
+    private String QUOTE_HOST;
 
     public VoteServiceImpl(VoteRepository voteRepository, RestTemplateBuilder builder,
                            VoteResultMapper voteResultMapper, VoteMapper voteMapper) {
@@ -176,8 +178,8 @@ public class VoteServiceImpl implements VoteService {
      * @param vote
      */
     private void deleteVoteFromUserAndQuote(Long userId, Long quoteId, Vote vote) {
-        String urlUser = HOST_NAME_USER + "deleteVote?userId=" + userId + "&voteId=" + vote.getId();
-        String urlQuote = HOST_NAME_QUOTE + "deleteVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
+        String urlUser = getUserHost() + "deleteVote?userId=" + userId + "&voteId=" + vote.getId();
+        String urlQuote = getQuoteHost() + "deleteVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
 
         try {
             restTemplate.put(urlUser, Void.class);
@@ -196,8 +198,8 @@ public class VoteServiceImpl implements VoteService {
      * @param vote
      */
     private void setVoteToUserAndQuote(Long userId, Long quoteId, Vote vote) {
-        String urlUser = HOST_NAME_USER + "setVote?userId=" + userId + "&voteId=" + vote.getId();
-        String urlQuote = HOST_NAME_QUOTE + "setVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
+        String urlUser = getUserHost() + "setVote?userId=" + userId + "&voteId=" + vote.getId();
+        String urlQuote = getQuoteHost() + "setVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
 
         try {
             restTemplate.put(urlUser, String.class);
@@ -278,6 +280,22 @@ public class VoteServiceImpl implements VoteService {
         if (longList.isEmpty()) {
             throw new NoSuchEntityException("There are not votes");
         }
+    }
+
+    /**
+     *
+     * @return URL to user service
+     */
+    private String getUserHost() {
+        return "http://" + USER_HOST + ":8081/service/";
+    }
+
+    /**
+     *
+     * @return URL to quote service
+     */
+    private String getQuoteHost() {
+        return "http://" + QUOTE_HOST + ":8082/service/";
     }
 
 

@@ -2,16 +2,15 @@ package com.example.quoteservice.services.impl;
 
 
 import com.example.quoteservice.model.dto.QuoteDto;
-import com.example.quoteservice.model.exceptions.NoSuchEntityException;
 import com.example.quoteservice.model.entity.Quote;
+import com.example.quoteservice.model.exceptions.NoSuchEntityException;
 import com.example.quoteservice.model.exceptions.UserDataBaseException;
 import com.example.quoteservice.model.mapper.QuoteMapper;
 import com.example.quoteservice.repository.QuotesRepository;
 import com.example.quoteservice.services.QuoteService;
+
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,14 @@ public class QuoteServiceImpl implements QuoteService {
     private final QuotesRepository quotesRepository;
 
     private final QuoteMapper quoteMapper;
-    //TODO change localhost to constant
-    private final String HOST_NAME_USER = "http://localhost:8081/service/";
-    private final String HOST_NAME_VOTE = "http://localhost:8083/service/";
 
+    @Value("${host.userservice}")
+    private String USER_HOST;
+    @Value("${host.voteservice}")
+    private String VOTE_HOST;
 
-    @Autowired
-    public QuoteServiceImpl(QuotesRepository quotesRepository, RestTemplateBuilder builder, QuoteMapper quoteMapper) {
+    public QuoteServiceImpl(QuotesRepository quotesRepository, RestTemplateBuilder builder,
+                             QuoteMapper quoteMapper) {
         this.quotesRepository = quotesRepository;
         this.restTemplate = builder.build();
         this.quoteMapper = quoteMapper;
@@ -58,14 +58,15 @@ public class QuoteServiceImpl implements QuoteService {
         quote.setUserAccountId(userId);
         quote.setDateOfCreation(Timestamp.valueOf(LocalDateTime.now()));
         quotesRepository.save(quote);
-        String url = HOST_NAME_USER + "setQuote?userId=" + userId + "&quoteId=" + quote.getId();
+        String url = getUserHost() + "setQuote?userId=" + userId + "&quoteId=" + quote.getId();
         try {
             log.info("Send response to user service");
+            log.info(url);
             restTemplate.put(url, Void.class);
         } catch (HttpClientErrorException e) {
             throw new UserDataBaseException("Exception in setting quote to user");
         }
-        return quoteMapper.toQuoteDto(quote);
+        return quoteMapper.toQuoteDto(quote, USER_HOST, VOTE_HOST);
 
     }
 
@@ -81,7 +82,7 @@ public class QuoteServiceImpl implements QuoteService {
         Quote quote = quotesRepository.findById(quoteId).orElseThrow(() ->
                 new NoSuchEntityException(String.format("Quote with id = %d does not exist", quoteId)));
         checkAuthority(userId, quote);
-        String url = HOST_NAME_USER + "deleteQuote?userId=" + userId + "&quoteId=" + quoteId;
+        String url = getUserHost() + "deleteQuote?userId=" + userId + "&quoteId=" + quoteId;
         try {
             log.info("Send response to user service");
             restTemplate.put(url, Void.class);
@@ -99,7 +100,7 @@ public class QuoteServiceImpl implements QuoteService {
      */
     @Override
     public QuoteDto getQuote(Long id) {
-        QuoteDto quoteDto = quoteMapper.toQuoteDto(findQuote(id));
+        QuoteDto quoteDto = quoteMapper.toQuoteDto(findQuote(id),  USER_HOST, VOTE_HOST);
         return quoteDto;
     }
 
@@ -126,11 +127,11 @@ public class QuoteServiceImpl implements QuoteService {
         log.info("Getting random quote");
         List<Quote> quoteList = quotesRepository.findAll();
         if (quoteList.isEmpty()) {
-            throw  new NoSuchEntityException(String.format("Quotes are empty"));
+            throw new NoSuchEntityException(String.format("Quotes are empty"));
         }
 
-        Quote quote = quoteList.get(new Random().nextInt(quoteList.size()-1));
-        return quoteMapper.toQuoteDto(quote);
+        Quote quote = quoteList.get(new Random().nextInt(quoteList.size() - 1));
+        return quoteMapper.toQuoteDto(quote,  USER_HOST, VOTE_HOST);
     }
 
     /**
@@ -149,12 +150,13 @@ public class QuoteServiceImpl implements QuoteService {
         quote.setDateOfUpdate(Timestamp.valueOf(LocalDateTime.now()));
         log.info("Changing quote with id = {} and author = {}", quoteId, userId);
         quotesRepository.save(quote);
-        return quoteMapper.toQuoteDto(quote);
+        return quoteMapper.toQuoteDto(quote,  USER_HOST, VOTE_HOST);
     }
 
     /**
      * Deleting vote id from quote model(if the vote was deleted).
      * Is needed to make connection between quote and its vote
+     *
      * @param quoteId
      * @param voteId
      */
@@ -172,6 +174,7 @@ public class QuoteServiceImpl implements QuoteService {
     /**
      * Setting vote id from quote model
      * Is needed to make connection between quote and its vote
+     *
      * @param quoteId
      * @param voteId
      */
@@ -193,7 +196,7 @@ public class QuoteServiceImpl implements QuoteService {
      */
     @Override
     public List<QuoteDto> getWorstQuotes() {
-        String url = HOST_NAME_VOTE + "/worst";
+        String url = getVoteHost() + "/worst";
         return getQuotesList(url);
     }
 
@@ -204,7 +207,7 @@ public class QuoteServiceImpl implements QuoteService {
      */
     @Override
     public List<QuoteDto> getBestQuotes() {
-        String url = HOST_NAME_VOTE + "/best";
+        String url = getVoteHost() + "/best";
         return getQuotesList(url);
     }
 
@@ -222,7 +225,7 @@ public class QuoteServiceImpl implements QuoteService {
             List<QuoteDto> quoteList = new ArrayList<>();
             for (Long id :
                     list) {
-                quoteList.add(quoteMapper.toQuoteDto(findQuote(id)));
+                quoteList.add(quoteMapper.toQuoteDto(findQuote(id),  USER_HOST, VOTE_HOST));
 
             }
             return quoteList;
@@ -245,4 +248,20 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
 
+
+    /**
+     *
+     * @return URL to user service
+     */
+    private String getUserHost() {
+        return "http://" + USER_HOST + ":8081/service/";
+    }
+
+    /**
+     *
+     * @return URL to vote service
+     */
+    private String getVoteHost() {
+        return "http://" + VOTE_HOST + ":8083/service/";
+    }
 }

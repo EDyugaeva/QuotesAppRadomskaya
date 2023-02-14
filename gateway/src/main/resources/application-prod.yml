@@ -1,0 +1,11 @@
+server:
+  port: 8090
+
+spring:
+  main:
+    web-application-type: reactive
+
+microservices:
+  quoteServiceHost: quoteservice
+  userServiceHost: userservice
+  voteServiceHost: voteservice
