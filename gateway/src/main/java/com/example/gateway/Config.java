@@ -16,7 +16,6 @@ public class Config {
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
-        //log.info("++++++++++++++++++++++++++++++QUOTE_SERVICE_HOST: " + hostConfig.getQuoteServiceHost());
         return builder.routes()
                 .route(p -> p
                         .path("/user/**")
