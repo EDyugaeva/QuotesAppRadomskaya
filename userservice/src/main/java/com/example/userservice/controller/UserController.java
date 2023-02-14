@@ -22,14 +22,14 @@ public class UserController {
     public UserDto createUser(@RequestParam String name,
                               @RequestParam String email,
                               @RequestParam String password) {
-        log.info("Create user");
+        log.info("Create user with name = {}, email = {}", name, email);
         return userAccountService.createUser(name, email, password);
 
     }
 
-    @GetMapping
+    @GetMapping("{id}")
     public UserDto getUser(@RequestParam Long id) {
-        log.info("Getting user with id = ", id);
+        log.info("Getting user with id = {}", id);
         return userAccountService.getUser(id);
     }
 

@@ -13,28 +13,26 @@ import java.util.Optional;
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
-    @Query(value = "SELECT * FROM vote WHERE quote_id = ? and user_account_id = ?", nativeQuery = true)
+    @Query(value = "SELECT * FROM vote WHERE quote = ? and author = ?", nativeQuery = true)
     Optional<Vote> getVoteBy(Long quoteId, Long userId);
 
-    Optional<Vote> findFirstByQuoteId(Long id);
 
-    @Query(value = "SELECT SUM(grade) FROM vote WHERE quote_id = ?", nativeQuery = true)
-    int getGradeByQuote(Long quoteId);
+    @Query(value = "SELECT SUM(grade) FROM vote WHERE quote = ?", nativeQuery = true)
+    Optional<Integer> getGradeByQuote(Long quoteId);
 
-    @Query(value = "SELECT user_account_id FROM vote WHERE quote_id = ?", nativeQuery = true)
-    List<Long> findUserAccoundId(Long quoteId);
-
-    @Query(value = "select quote_id from vote group by quote_id order by sum(grade) desc limit 10;", nativeQuery = true)
+    @Query(value = "select quote from vote group by quote order by sum(grade) desc limit 10;", nativeQuery = true)
     List<Long> findTopTenQuery();
 
-    @Query(value = "select quote_id from vote group by quote_id order by sum(grade) limit 10;", nativeQuery = true)
+    @Query(value = "select quote from vote group by quote order by sum(grade) limit 10;", nativeQuery = true)
     List<Long> findWorseTenQuery();
 
-    @Query(value = "SELECT SUM(grade) FROM vote WHERE quote_id = ? and date_of_creation = ?", nativeQuery = true)
+    @Query(value = "SELECT SUM(grade) FROM vote WHERE quote = ? and date_of_creation = ?", nativeQuery = true)
     Integer getGradeByQuoteAndDate(Long quoteId, LocalDate date);
 
-    @Query(value = "SELECT  MIN(date_of_creation) from vote where quote_id = ?", nativeQuery = true)
+    @Query(value = "SELECT  MIN(date_of_creation) from vote where quote = ?", nativeQuery = true)
     LocalDate findTheFirstDateOfVotesFromQuoteWithId(Long id);
 
-    Optional<Vote> findVoteById(Long id);
+    List<Vote> findVoteByQuote(Long quoteId);
+
+
 }

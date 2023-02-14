@@ -2,12 +2,16 @@ package com.example.voteservice.model.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class VoteDto {
-    private Integer author;
-    private String createdAt;
-    private Integer quote;
-    private Integer grade;
+
+    private Long author;
+    private LocalDate createdAt;
+
+    private int grade;
+
 
 
 }
