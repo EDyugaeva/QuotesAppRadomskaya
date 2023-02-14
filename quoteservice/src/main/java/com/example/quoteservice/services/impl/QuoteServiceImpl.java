@@ -66,7 +66,7 @@ public class QuoteServiceImpl implements QuoteService {
         } catch (HttpClientErrorException e) {
             throw new UserDataBaseException("Exception in setting quote to user");
         }
-        return quoteMapper.toQuoteDto(quote, USER_HOST, VOTE_HOST);
+        return quoteMapper.toQuoteDto(quote);
 
     }
 
@@ -100,7 +100,7 @@ public class QuoteServiceImpl implements QuoteService {
      */
     @Override
     public QuoteDto getQuote(Long id) {
-        QuoteDto quoteDto = quoteMapper.toQuoteDto(findQuote(id),  USER_HOST, VOTE_HOST);
+        QuoteDto quoteDto = quoteMapper.toQuoteDto(findQuote(id));
         return quoteDto;
     }
 
@@ -131,7 +131,7 @@ public class QuoteServiceImpl implements QuoteService {
         }
 
         Quote quote = quoteList.get(new Random().nextInt(quoteList.size() - 1));
-        return quoteMapper.toQuoteDto(quote,  USER_HOST, VOTE_HOST);
+        return quoteMapper.toQuoteDto(quote);
     }
 
     /**
@@ -150,7 +150,7 @@ public class QuoteServiceImpl implements QuoteService {
         quote.setDateOfUpdate(Timestamp.valueOf(LocalDateTime.now()));
         log.info("Changing quote with id = {} and author = {}", quoteId, userId);
         quotesRepository.save(quote);
-        return quoteMapper.toQuoteDto(quote,  USER_HOST, VOTE_HOST);
+        return quoteMapper.toQuoteDto(quote);
     }
 
     /**
@@ -225,7 +225,7 @@ public class QuoteServiceImpl implements QuoteService {
             List<QuoteDto> quoteList = new ArrayList<>();
             for (Long id :
                     list) {
-                quoteList.add(quoteMapper.toQuoteDto(findQuote(id),  USER_HOST, VOTE_HOST));
+                quoteList.add(quoteMapper.toQuoteDto(findQuote(id)));
 
             }
             return quoteList;
