@@ -12,7 +12,7 @@ import java.time.Instant;
 public interface QuoteMapper {
     //TODO change localhost to constant
     //TODO votes link
-    @Mapping(target = "linkOnAuthor", expression = "java(\"http://localhost:8090/user/\" + quote.getUserAccountId())")
+    @Mapping(target = "linkOnAuthor", expression = "java(\"http://localhost:8090/user/\"  +quote.getUserAccountId())")
     @Mapping(target = "linkOnVotes", expression = "java(\"http://localhost:8090/vote/quote/\" + quote.getId())")
     QuoteDto toQuoteDto(Quote quote);
 

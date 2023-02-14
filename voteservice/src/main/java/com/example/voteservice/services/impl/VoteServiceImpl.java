@@ -32,13 +32,14 @@ public class VoteServiceImpl implements VoteService {
     private final VoteResultMapper voteResultMapper;
 
     private final VoteMapper voteMapper;
-//TODO localhost вынести
+    //TODO change localhost to constant
 
     private final String HOST_NAME_USER = "http://localhost:8081/service/";
     private final String HOST_NAME_QUOTE = "http://localhost:8082/service/";
 
 
-    public VoteServiceImpl(VoteRepository voteRepository, RestTemplateBuilder builder, VoteResultMapper voteResultMapper, VoteMapper voteMapper) {
+    public VoteServiceImpl(VoteRepository voteRepository, RestTemplateBuilder builder,
+                           VoteResultMapper voteResultMapper, VoteMapper voteMapper) {
         this.voteRepository = voteRepository;
         this.restTemplate = builder.build();
         this.voteResultMapper = voteResultMapper;

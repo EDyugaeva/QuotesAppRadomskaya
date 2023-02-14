@@ -31,7 +31,7 @@ public class QuoteServiceImpl implements QuoteService {
     private final QuotesRepository quotesRepository;
 
     private final QuoteMapper quoteMapper;
-
+    //TODO change localhost to constant
     private final String HOST_NAME_USER = "http://localhost:8081/service/";
     private final String HOST_NAME_VOTE = "http://localhost:8083/service/";
 
@@ -111,7 +111,8 @@ public class QuoteServiceImpl implements QuoteService {
      */
     public Quote findQuote(Long id) {
         log.info("Finding quote with id = " + id);
-        Quote quote = quotesRepository.findById(id).orElseThrow(() -> new NoSuchEntityException(String.format("Quote with id = %d does not exist", id)));
+        Quote quote = quotesRepository.findById(id).orElseThrow(() ->
+                new NoSuchEntityException(String.format("Quote with id = %d does not exist", id)));
         return quote;
     }
 
@@ -124,7 +125,11 @@ public class QuoteServiceImpl implements QuoteService {
     public QuoteDto getRandomQuote() {
         log.info("Getting random quote");
         List<Quote> quoteList = quotesRepository.findAll();
-        Quote quote = quoteList.stream().findAny().orElseThrow(() -> new NoSuchEntityException(String.format("Quotes are empty")));
+        if (quoteList.isEmpty()) {
+            throw  new NoSuchEntityException(String.format("Quotes are empty"));
+        }
+
+        Quote quote = quoteList.get(new Random().nextInt(quoteList.size()-1));
         return quoteMapper.toQuoteDto(quote);
     }
 

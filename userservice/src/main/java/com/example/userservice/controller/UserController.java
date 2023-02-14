@@ -27,10 +27,10 @@ public class UserController {
 
     }
 
-    @GetMapping("{id}")
-    public UserDto getUser(@RequestParam Long id) {
+    @GetMapping({"{id}"})
+    public UserDto getUser(@PathVariable Long id) {
         log.info("Getting user with id = {}", id);
-        return userAccountService.getUser(id);
+        return userAccountService.getUser(id    );
     }
 
 

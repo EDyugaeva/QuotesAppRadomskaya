@@ -37,19 +37,19 @@ public class VoteController {
 
 
     @GetMapping(path = "/graph/{id}")
-    public Map<String, Integer> getGraph(@RequestParam Long id) {
+    public Map<String, Integer> getGraph(@PathVariable Long id) {
         log.info("try to get graph votes to quote with id = {}", id);
         return voteService.getGraphForQuote(id);
     }
 
     @GetMapping("/result/{id}")
-    public VoteResultDto getVoteResult(@RequestParam Long id) {
+    public VoteResultDto getVoteResult(@PathVariable Long id) {
         log.info("Try to get result vote to quote with id = {}", id);
         return voteService.getVoteFromQuote(id);
     }
 
     @GetMapping("/quote/{id}")
-    public List<VoteDto> getAllVote(@RequestParam Long id) {
+    public List<VoteDto> getAllVote(@PathVariable Long id) {
         log.info("Try to all votes from quote = {}", id) ;
         return voteService.getVotesFromQuote(id);
     }

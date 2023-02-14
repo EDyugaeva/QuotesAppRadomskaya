@@ -2,7 +2,9 @@ package com.example.userservice.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -15,6 +17,8 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "user_account")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserAccount {
     @Id
     @GeneratedValue
@@ -32,8 +36,6 @@ public class UserAccount {
     @ElementCollection
     private Set<Long> votes;
 
-    public UserAccount() {
-    }
 
     @Override
     public String toString() {
