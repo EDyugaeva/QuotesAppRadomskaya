@@ -1,0 +1,23 @@
+version: '3'
+services:
+  gateway:
+    image: radomskaya/gateway
+    build: gateway
+    ports:
+      - "8090:8090/tcp"
+    depends_on:
+      - userservice
+      - quoteservice
+      - voteservice
+
+  userservice:
+    image: radomskaya/userservice
+    build: gateway
+
+  quoteservice:
+    image: radomskaya/quoteservice
+    build: gateway
+
+  voteservice:
+    image: radomskaya/voteservice
+    build: gateway
