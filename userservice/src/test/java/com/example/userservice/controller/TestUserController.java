@@ -3,9 +3,11 @@ package com.example.userservice.controller;
 import com.example.userservice.model.entity.UserAccount;
 import com.example.userservice.model.exceptions.NoSuchEntityException;
 import com.example.userservice.model.mapper.UserMapperImpl;
+import com.example.userservice.model.mapper.UserRegistrationMapperImpl;
 import com.example.userservice.repository.UserAccountRepository;
 import com.example.userservice.services.impl.UserAccountServiceImpl;
-import org.aspectj.lang.annotation.Before;
+import net.minidev.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class TestUserController {
     @SpyBean
     private UserMapperImpl userMapper;
 
+    @SpyBean
+    private UserRegistrationMapperImpl userRegistrationMapper;
 
 
     @Test
@@ -49,8 +53,12 @@ public class TestUserController {
         assertThat(userController).isNotNull();
     }
 
-    @Before("")
-    public void startDate() {
+    private final JSONObject userObject = new JSONObject();
+    @BeforeEach
+    private void StartData() {
+        userObject.put("name", NAME);
+        userObject.put("email", EMAIL);
+        userObject.put("password", PASSWORD);
 
     }
 
@@ -59,11 +67,13 @@ public class TestUserController {
     public void testAddUser() {
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(USER_ACCOUNT);
         when(userAccountRepository.findUserAccountByEmail(EMAIL)).thenReturn(Optional.empty());
-        String url = URL + PORT + "/user?name=" + NAME + "&email=" + EMAIL + "&password=" + PASSWORD;
+        String url = URL + PORT + "/user";
         System.out.println(url);
         try {
             mockMvc.perform(MockMvcRequestBuilders
                             .post(url)
+                            .content(userObject.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.name").value(NAME))
@@ -78,11 +88,47 @@ public class TestUserController {
     public void testAddUserWithExistingEmail() {
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(USER_ACCOUNT);
         when(userAccountRepository.findUserAccountByEmail(EMAIL)).thenReturn(Optional.of(USER_ACCOUNT));
-        String url = URL + PORT + "/user?name=" + NAME + "&email=" + EMAIL + "&password=" + PASSWORD;
-        System.out.println(url);
+        String url = URL + PORT + ADDRESS;
         try {
             mockMvc.perform(MockMvcRequestBuilders
                             .post(url)
+                            .content(userObject.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest());
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testAddUserWithError() {
+
+        String url = URL + PORT + ADDRESS;
+
+        JSONObject userObjectError = new JSONObject();
+        userObjectError.put("name", NAME);
+
+        try {
+            mockMvc.perform(MockMvcRequestBuilders
+                            .post(url)
+                            .content(userObjectError.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest());
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        userObject.remove("name");
+        userObject.put("password", PASSWORD);
+        try {
+            mockMvc.perform(MockMvcRequestBuilders
+                            .post(url)
+                            .content(userObjectError.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
 

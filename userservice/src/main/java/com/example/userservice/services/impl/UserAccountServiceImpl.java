@@ -2,6 +2,7 @@ package com.example.userservice.services.impl;
 
 
 import com.example.userservice.model.dto.UserDto;
+import com.example.userservice.model.dto.UserRegistrationDto;
 import com.example.userservice.model.exceptions.NoSuchEntityException;
 import com.example.userservice.model.entity.UserAccount;
 import com.example.userservice.model.mapper.UserMapper;
@@ -26,13 +27,17 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 
     @Override
-    public UserDto createUser(String name, String email, String password) {
+    public UserDto createUser(UserRegistrationDto userRegistrationDto) {
+        String email = userRegistrationDto.getEmail();
         if (!userAccountRepository.findUserAccountByEmail(email).isEmpty()) {
             throw new IllegalArgumentException("This email is registered");
         }
+        String name = userRegistrationDto.getName();
         UserAccount savingUser = new UserAccount();
         savingUser.setName(name);
         savingUser.setEmail(email);
+        String password = userRegistrationDto.getPassword();
+
         savingUser.setPassword(password);
         savingUser.setDateOfCreation(Timestamp.valueOf(LocalDateTime.now()));
         log.info("Saving user with name = {}", name);
