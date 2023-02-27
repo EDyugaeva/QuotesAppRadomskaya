@@ -10,6 +10,7 @@ public class Constants {
 
     public final static String URL = "http://localhost:";
     public final static String PORT = "8081";
+    public final static String ADDRESS = "/user";
     public static final String EMAIL = "email";
     public static final String NAME = "name";
      public static final String PASSWORD = "password";

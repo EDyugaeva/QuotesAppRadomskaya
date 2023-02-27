@@ -2,9 +2,10 @@ package com.example.userservice.services;
 
 
 import com.example.userservice.model.dto.UserDto;
+import com.example.userservice.model.dto.UserRegistrationDto;
 
 public interface UserAccountService {
-    UserDto createUser(String name, String email, String password);
+    UserDto createUser(UserRegistrationDto userRegistrationDto);
 
     UserDto getUser(Long id);
 

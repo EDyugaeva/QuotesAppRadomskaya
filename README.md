@@ -2,7 +2,7 @@
 
 This project consists of 3 microservices and gateway.
 1. Userservice is made to interact with user model:
-* POST: ../user?name={name}&email={email}&password={password}
+* POST: ../user{user body (name = .., email = ..., password = ...}
 * GET: /user/{userId}
 
 2. Quoteservice is made to interact with quotes. With adding quotes there are changes in userservice
