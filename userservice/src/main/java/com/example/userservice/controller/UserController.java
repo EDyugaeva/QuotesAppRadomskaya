@@ -1,6 +1,7 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.model.dto.UserDto;
+import com.example.userservice.model.dto.UserRegistrationDto;
 import com.example.userservice.services.UserAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -19,18 +20,20 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createUser(@RequestParam String name,
-                              @RequestParam String email,
-                              @RequestParam String password) {
-        log.info("Create user with name = {}, email = {}", name, email);
-        return userAccountService.createUser(name, email, password);
+    public UserDto createUser(@RequestBody UserRegistrationDto userRegistrationDto) {
+        if (userRegistrationDto.getPassword() == null || userRegistrationDto.getEmail() == null || userRegistrationDto.getName() == null) {
+            throw new IllegalArgumentException("Exception in creating user");
+        }
+        log.info("Create user with dto", userRegistrationDto);
+
+        return userAccountService.createUser(userRegistrationDto);
 
     }
 
     @GetMapping({"{id}"})
     public UserDto getUser(@PathVariable Long id) {
         log.info("Getting user with id = {}", id);
-        return userAccountService.getUser(id    );
+        return userAccountService.getUser(id);
     }
 
 
