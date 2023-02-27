@@ -8,11 +8,26 @@
 	"item": [
 		{
 			"name": "create user",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"Kate\",\r\n\"email\": \"kate-email\",\r\n\"password\": \"password\"\r\n}"
+				},
 				"url": {
-					"raw": "http://localhost:8090/user?name=Yurii&email=email&password=password",
+					"raw": "http://localhost:8090/user",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -20,20 +35,6 @@
 					"port": "8090",
 					"path": [
 						"user"
-					],
-					"query": [
-						{
-							"key": "name",
-							"value": "Yurii"
-						},
-						{
-							"key": "email",
-							"value": "email"
-						},
-						{
-							"key": "password",
-							"value": "password"
-						}
 					]
 				}
 			},
@@ -41,11 +42,26 @@
 		},
 		{
 			"name": "create user",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"name\": \"Yurii\",\r\n\"email\": \"yurii-email\",\r\n\"password\": \"password\"\r\n}"
+				},
 				"url": {
-					"raw": "http://localhost:8090/user?name=Kate&email=kateemail&password=password",
+					"raw": "http://localhost:8090/user",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -53,20 +69,6 @@
 					"port": "8090",
 					"path": [
 						"user"
-					],
-					"query": [
-						{
-							"key": "name",
-							"value": "Kate"
-						},
-						{
-							"key": "email",
-							"value": "kateemail"
-						},
-						{
-							"key": "password",
-							"value": "password"
-						}
 					]
 				}
 			},
