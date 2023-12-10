@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 /**
  * Controller to interact with quotes (get, post, put, delete)
  */
@@ -40,9 +41,9 @@ public class QuoteController {
         return quoteService.getRandomQuote();
     }
 
-    @PatchMapping
+    @PatchMapping("/{quoteId}")
     public QuoteDto changeQuote(@RequestBody QuoteCreatingDto quoteCreatingDto,
-                             @RequestParam Long quoteId) {
+                                @PathVariable Long quoteId) {
         return quoteService.changeQuote(quoteId, quoteCreatingDto);
     }
 

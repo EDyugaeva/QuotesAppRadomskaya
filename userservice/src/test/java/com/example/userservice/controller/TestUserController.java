@@ -66,7 +66,6 @@ public class TestUserController {
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(USER_ACCOUNT);
         when(userAccountRepository.findUserAccountByEmail(EMAIL)).thenReturn(Optional.empty());
         String url = URL + PORT + "/user";
-        System.out.println(url);
         try {
             mockMvc.perform(MockMvcRequestBuilders
                             .post(url)
