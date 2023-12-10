@@ -16,13 +16,19 @@
     <properties>
         <java.version>11</java.version>
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
-        <org.projectlombok.version>1.18.16</org.projectlombok.version>
+        <org.projectlombok.version>1.18.28</org.projectlombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.6</version>
         </dependency>
 
         <dependency>
@@ -91,7 +97,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.example.quoteservice.QuoteserviceApplication</mainClass>
+                            <mainClass>com.example.quoteservice.QuoteServiceApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

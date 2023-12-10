@@ -17,10 +17,11 @@
     <properties>
         <java.version>11</java.version>
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
-        <org.projectlombok.version>1.18.16</org.projectlombok.version>
+        <org.projectlombok.version>1.18.28</org.projectlombok.version>
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -92,7 +93,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.example.userservice.UserserviceApplication</mainClass>
+                            <mainClass>com.example.userservice.UserServiceApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

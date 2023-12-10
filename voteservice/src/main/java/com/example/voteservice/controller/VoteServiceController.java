@@ -31,6 +31,4 @@ public class VoteServiceController {
         log.info("Get worst 10 quotes");
         return voteService.getWorseTen();
     }
-
-
 }

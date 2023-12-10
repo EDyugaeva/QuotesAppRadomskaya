@@ -6,6 +6,4 @@ import lombok.Data;
 public class VoteResultDto {
     private Integer quote;
     private Integer result;
-
-
 }

@@ -59,16 +59,13 @@ public class TestUserController {
         userObject.put("name", NAME);
         userObject.put("email", EMAIL);
         userObject.put("password", PASSWORD);
-
     }
-
 
     @Test
     public void testAddUser() {
         when(userAccountRepository.save(any(UserAccount.class))).thenReturn(USER_ACCOUNT);
         when(userAccountRepository.findUserAccountByEmail(EMAIL)).thenReturn(Optional.empty());
         String url = URL + PORT + "/user";
-        System.out.println(url);
         try {
             mockMvc.perform(MockMvcRequestBuilders
                             .post(url)
@@ -104,7 +101,6 @@ public class TestUserController {
 
     @Test
     public void testAddUserWithError() {
-
         String url = URL + PORT + ADDRESS;
 
         JSONObject userObjectError = new JSONObject();
@@ -163,7 +159,5 @@ public class TestUserController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

@@ -99,8 +99,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\":\"new quote\",\r\n    \"userId\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/quote/?content=text quote&id=1",
+					"raw": "http://localhost:8090/quote/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -113,11 +122,13 @@
 					"query": [
 						{
 							"key": "content",
-							"value": "text quote"
+							"value": "text quote",
+							"disabled": true
 						},
 						{
 							"key": "id",
-							"value": "1"
+							"value": "1",
+							"disabled": true
 						}
 					]
 				}
@@ -129,8 +140,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\":\"new quote\",\r\n    \"userId\":2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/quote/?content=text quote type 2&id=2",
+					"raw": "http://localhost:8090/quote/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -143,11 +163,13 @@
 					"query": [
 						{
 							"key": "content",
-							"value": "text quote type 2"
+							"value": "text quote type 2",
+							"disabled": true
 						},
 						{
 							"key": "id",
-							"value": "2"
+							"value": "2",
+							"disabled": true
 						}
 					]
 				}
@@ -159,8 +181,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\":\"new quote 3\",\r\n    \"userId\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/quote/?content=text quote type 3&id=2",
+					"raw": "http://localhost:8090/quote/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -169,16 +200,6 @@
 					"path": [
 						"quote",
 						""
-					],
-					"query": [
-						{
-							"key": "content",
-							"value": "text quote type 3"
-						},
-						{
-							"key": "id",
-							"value": "2"
-						}
 					]
 				}
 			},
@@ -187,10 +208,19 @@
 		{
 			"name": "change quote",
 			"request": {
-				"method": "PUT",
+				"method": "PATCH",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\": \"Changed seond quote\",\r\n    \"userId\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/quote/?content=text quote changed&quoteId=2&userId=2",
+					"raw": "http://localhost:8090/quote/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -198,21 +228,7 @@
 					"port": "8090",
 					"path": [
 						"quote",
-						""
-					],
-					"query": [
-						{
-							"key": "content",
-							"value": "text quote changed"
-						},
-						{
-							"key": "quoteId",
-							"value": "2"
-						},
-						{
-							"key": "userId",
-							"value": "2"
-						}
+						"2"
 					]
 				}
 			},
@@ -223,8 +239,17 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":1,\r\n    \"quoteId\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/quote/?quoteId=3&userId=1",
+					"raw": "http://localhost:8090/quote/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -233,21 +258,6 @@
 					"path": [
 						"quote",
 						""
-					],
-					"query": [
-						{
-							"key": "content",
-							"value": "text quote new",
-							"disabled": true
-						},
-						{
-							"key": "quoteId",
-							"value": "3"
-						},
-						{
-							"key": "userId",
-							"value": "1"
-						}
 					]
 				}
 			},
@@ -258,8 +268,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": 1,\r\n    \"quoteId\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/vote/up?quoteId=1&userId=1",
+					"raw": "http://localhost:8090/vote/up",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -268,16 +287,6 @@
 					"path": [
 						"vote",
 						"up"
-					],
-					"query": [
-						{
-							"key": "quoteId",
-							"value": "1"
-						},
-						{
-							"key": "userId",
-							"value": "1"
-						}
 					]
 				}
 			},
@@ -288,8 +297,17 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": 1,\r\n    \"quoteId\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8090/vote/down?quoteId=2&userId=1",
+					"raw": "http://localhost:8090/vote/down",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -298,16 +316,6 @@
 					"path": [
 						"vote",
 						"down"
-					],
-					"query": [
-						{
-							"key": "quoteId",
-							"value": "2"
-						},
-						{
-							"key": "userId",
-							"value": "1"
-						}
 					]
 				}
 			},
@@ -319,7 +327,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8090/quote/1",
+					"raw": "http://localhost:8090/quote/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -327,7 +335,7 @@
 					"port": "8090",
 					"path": [
 						"quote",
-						"1"
+						"2"
 					]
 				}
 			},
@@ -354,7 +362,7 @@
 			"response": []
 		},
 		{
-			"name": "best quotes Copy",
+			"name": "best quotes",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -399,7 +407,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8090/vote/result/1",
+					"raw": "http://localhost:8090/vote/result/3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -408,7 +416,7 @@
 					"path": [
 						"vote",
 						"result",
-						"1"
+						"3"
 					]
 				}
 			},
@@ -420,7 +428,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8090/vote/graph/1",
+					"raw": "http://localhost:8090/vote/graph/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -429,7 +437,7 @@
 					"path": [
 						"vote",
 						"graph",
-						"1"
+						"2"
 					]
 				}
 			},
@@ -441,7 +449,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8090/vote/quote/1",
+					"raw": "http://localhost:8090/vote/quote/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -450,7 +458,7 @@
 					"path": [
 						"vote",
 						"quote",
-						"1"
+						"2"
 					]
 				}
 			},

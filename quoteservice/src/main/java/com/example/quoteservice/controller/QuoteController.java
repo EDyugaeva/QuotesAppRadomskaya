@@ -1,11 +1,14 @@
 package com.example.quoteservice.controller;
 
+import com.example.quoteservice.model.dto.QuoteCreatingDto;
 import com.example.quoteservice.model.dto.QuoteDto;
+import com.example.quoteservice.model.dto.QuoteUserDto;
 import com.example.quoteservice.services.QuoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 /**
  * Controller to interact with quotes (get, post, put, delete)
  */
@@ -21,11 +24,9 @@ public class QuoteController {
     }
 
     @PostMapping
-    public QuoteDto createQuote(@RequestParam String content,
-                                @RequestParam Long id) {
-        log.info("Creating quotes");
-        return quoteService.createQuote(content, id);
-
+    public QuoteDto createQuote(@RequestBody QuoteCreatingDto quoteCreatingDto) {
+        log.info("Creating quote {}", quoteCreatingDto);
+        return quoteService.createQuote(quoteCreatingDto);
     }
 
     @GetMapping("{id}")
@@ -38,20 +39,17 @@ public class QuoteController {
     public QuoteDto getRandomQuote() {
         log.info("Getting random quotes");
         return quoteService.getRandomQuote();
-
     }
 
-    @PutMapping
-    public QuoteDto changeQuote(@RequestParam String content,
-                             @RequestParam Long quoteId,
-                             @RequestParam Long userId) {
-        return quoteService.changeQuote(content, quoteId, userId);
+    @PatchMapping("/{quoteId}")
+    public QuoteDto changeQuote(@RequestBody QuoteCreatingDto quoteCreatingDto,
+                                @PathVariable Long quoteId) {
+        return quoteService.changeQuote(quoteId, quoteCreatingDto);
     }
 
     @DeleteMapping
-    public void deleteMapping(@RequestParam Long quoteId,
-                              @RequestParam Long userId) {
-        quoteService.deleteQuote(quoteId, userId);
+    public void deleteMapping(@RequestBody QuoteUserDto quoteUserDto) {
+        quoteService.deleteQuote(quoteUserDto);
     }
 
     @GetMapping(path = "/best")
@@ -63,7 +61,4 @@ public class QuoteController {
     public List<QuoteDto> getWorstQuotes() {
         return quoteService.getWorstQuotes();
     }
-
-
-
 }

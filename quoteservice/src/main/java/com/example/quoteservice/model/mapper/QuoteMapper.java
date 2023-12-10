@@ -16,7 +16,6 @@ public interface QuoteMapper {
     @Mapping(target = "linkOnAuthor", expression = "java(\"http://localhost:8090/user/\"  +quote.getUserAccountId())")
     @Mapping(target = "linkOnVotes", expression = "java(\"http://localhost:8090/vote/quote/\" + quote.getId())")
     QuoteDto toQuoteDto(Quote quote);
-
     default Timestamp map(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
     }

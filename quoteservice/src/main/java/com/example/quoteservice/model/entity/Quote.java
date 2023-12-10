@@ -1,6 +1,7 @@
 package com.example.quoteservice.model.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -12,21 +13,18 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "quote")
+@NoArgsConstructor
 public class Quote {
 
     @Id
     @GeneratedValue
     private Long id;
-
     private String content;
     private Timestamp dateOfCreation;
     private Timestamp dateOfUpdate;
     private Long userAccountId;
     @ElementCollection
     private Set<Long> votes;
-
-    public Quote() {
-    }
 
     @Override
     public String toString() {

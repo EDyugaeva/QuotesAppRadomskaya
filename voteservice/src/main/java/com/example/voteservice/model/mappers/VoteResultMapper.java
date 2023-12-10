@@ -12,7 +12,6 @@ import java.time.Instant;
 public interface VoteResultMapper {
     @Mapping(target = "result", source = "result")
     VoteResultDto voteDto(Vote vote, int result);
-
     default Timestamp map(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
     }

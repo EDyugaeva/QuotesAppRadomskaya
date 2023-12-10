@@ -1,17 +1,19 @@
 package com.example.quoteservice.services.impl;
 
 
+import com.example.quoteservice.model.dto.QuoteCreatingDto;
 import com.example.quoteservice.model.dto.QuoteDto;
+import com.example.quoteservice.model.dto.QuoteUserDto;
+import com.example.quoteservice.model.dto.QuoteVoteDto;
 import com.example.quoteservice.model.entity.Quote;
 import com.example.quoteservice.model.exceptions.NoSuchEntityException;
 import com.example.quoteservice.model.exceptions.UserDataBaseException;
 import com.example.quoteservice.model.mapper.QuoteMapper;
 import com.example.quoteservice.repository.QuotesRepository;
 import com.example.quoteservice.services.QuoteService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +28,8 @@ import java.util.*;
 @Slf4j
 @Transactional(rollbackFor = Exception.class)
 public class QuoteServiceImpl implements QuoteService {
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     private final QuotesRepository quotesRepository;
-
     private final QuoteMapper quoteMapper;
 
     @Value("${host.userservice}")
@@ -36,57 +37,59 @@ public class QuoteServiceImpl implements QuoteService {
     @Value("${host.voteservice}")
     private String VOTE_HOST;
 
-    public QuoteServiceImpl(QuotesRepository quotesRepository, RestTemplateBuilder builder,
-                             QuoteMapper quoteMapper) {
+    public QuoteServiceImpl(QuotesRepository quotesRepository, RestTemplate restTemplate,
+                            QuoteMapper quoteMapper) {
         this.quotesRepository = quotesRepository;
-        this.restTemplate = builder.build();
+        this.restTemplate = restTemplate;
         this.quoteMapper = quoteMapper;
     }
 
     /**
      * Creating and saving quotes
      *
-     * @param content - text for Quote
-     * @param userId  - author
      * @return Quote representation. Could throw an exception if the user does not exist or there are problem with base
      */
     @Override
-    public QuoteDto createQuote(String content, Long userId) {
+    public QuoteDto createQuote(QuoteCreatingDto quoteCreatingDto) {
         Quote quote = new Quote();
         log.info("Try to save quotes");
-        quote.setContent(content);
-        quote.setUserAccountId(userId);
+        quote.setContent(quoteCreatingDto.getContent());
+        quote.setUserAccountId(quoteCreatingDto.getUserId());
         quote.setDateOfCreation(Timestamp.valueOf(LocalDateTime.now()));
         quotesRepository.save(quote);
-        String url = getUserHost() + "setQuote?userId=" + userId + "&quoteId=" + quote.getId();
+        QuoteUserDto savingDto = new QuoteUserDto(quote.getId(), quoteCreatingDto.getUserId());
+        String url = getUserHost() + "setQuote";
+        final HttpEntity<QuoteUserDto> requestEntity = new HttpEntity<>(savingDto);
+
         try {
             log.info("Send response to user service");
-            log.info(url);
-            restTemplate.put(url, Void.class);
+            log.info(url + " with object {}", savingDto);
+            restTemplate.patchForObject(url, requestEntity, Void.class);
         } catch (HttpClientErrorException e) {
+            log.warn("error while saving new quote", e);
             throw new UserDataBaseException("Exception in setting quote to user");
         }
         return quoteMapper.toQuoteDto(quote);
-
     }
 
     /**
      * Deleting quotes. Delete quote from user also.
      * Could throw an exception if the user or quote does not exist or there are problem with base
-     *
-     * @param quoteId - quote Id
-     * @param userId  - author
      */
     @Override
-    public void deleteQuote(Long quoteId, Long userId) {
+    public void deleteQuote(QuoteUserDto quoteUserDto) {
+        Long quoteId = quoteUserDto.getQuoteId();
+        Long userId = quoteUserDto.getUserId();
         Quote quote = quotesRepository.findById(quoteId).orElseThrow(() ->
                 new NoSuchEntityException(String.format("Quote with id = %d does not exist", quoteId)));
         checkAuthority(userId, quote);
-        String url = getUserHost() + "deleteQuote?userId=" + userId + "&quoteId=" + quoteId;
+        String url = getUserHost() + "deleteQuote";
         try {
-            log.info("Send response to user service");
-            restTemplate.put(url, Void.class);
+            log.info("Send response to user service with object {}", quoteUserDto);
+            log.info(url);
+            restTemplate.patchForObject(url, quoteUserDto, Void.class);
         } catch (HttpClientErrorException e) {
+            log.warn("error while deleting quote with id = {}", quoteId, e);
             throw new UserDataBaseException("Exception in deleting quote from user");
         }
         quotesRepository.delete(quote);
@@ -100,8 +103,7 @@ public class QuoteServiceImpl implements QuoteService {
      */
     @Override
     public QuoteDto getQuote(Long id) {
-        QuoteDto quoteDto = quoteMapper.toQuoteDto(findQuote(id));
-        return quoteDto;
+        return quoteMapper.toQuoteDto(findQuote(id));
     }
 
     /**
@@ -112,9 +114,8 @@ public class QuoteServiceImpl implements QuoteService {
      */
     public Quote findQuote(Long id) {
         log.info("Finding quote with id = " + id);
-        Quote quote = quotesRepository.findById(id).orElseThrow(() ->
+        return quotesRepository.findById(id).orElseThrow(() ->
                 new NoSuchEntityException(String.format("Quote with id = %d does not exist", id)));
-        return quote;
     }
 
     /**
@@ -127,28 +128,24 @@ public class QuoteServiceImpl implements QuoteService {
         log.info("Getting random quote");
         List<Quote> quoteList = quotesRepository.findAll();
         if (quoteList.isEmpty()) {
-            throw new NoSuchEntityException(String.format("Quotes are empty"));
+            throw new NoSuchEntityException("Quotes are empty");
         }
-
-        Quote quote = quoteList.get(new Random().nextInt(quoteList.size() - 1));
+        Quote quote = quoteList.get(new Random().nextInt(quoteList.size()));
         return quoteMapper.toQuoteDto(quote);
     }
 
     /**
-     * Changing content in quot
+     * Changing content in quote
      *
-     * @param content - new text
-     * @param quoteId
-     * @param userId
      * @return quote dto or exception if this is not the right author
      */
     @Override
-    public QuoteDto changeQuote(String content, Long quoteId, Long userId) {
+    public QuoteDto changeQuote(Long quoteId, QuoteCreatingDto quoteCreatingDto) {
         Quote quote = findQuote(quoteId);
-        checkAuthority(userId, quote);
-        quote.setContent(content);
+        checkAuthority(quoteCreatingDto.getUserId(), quote);
+        quote.setContent(quoteCreatingDto.getContent());
         quote.setDateOfUpdate(Timestamp.valueOf(LocalDateTime.now()));
-        log.info("Changing quote with id = {} and author = {}", quoteId, userId);
+        log.info("Changing quote with id = {} and author = {}", quoteId, quoteCreatingDto.getUserId());
         quotesRepository.save(quote);
         return quoteMapper.toQuoteDto(quote);
     }
@@ -156,37 +153,35 @@ public class QuoteServiceImpl implements QuoteService {
     /**
      * Deleting vote id from quote model(if the vote was deleted).
      * Is needed to make connection between quote and its vote
-     *
-     * @param quoteId
-     * @param voteId
      */
     @Override
-    public void deleteVoteFromQuote(Long quoteId, Long voteId) {
+    public void deleteVoteFromQuote(QuoteVoteDto quoteVoteDto) {
+        Long voteId = quoteVoteDto.getVoteId();
+        Long quoteId = quoteVoteDto.getQuoteId();
         log.info("delete vote id = {} from quote id = {}", voteId, quoteId);
         Quote quote = findQuote(quoteId);
         Set<Long> newVotes = quote.getVotes();
         newVotes.remove(quoteId);
         quote.setVotes(newVotes);
         quote = quotesRepository.save(quote);
-        log.info("Quote with id = {} has sunh votes = {}", quoteId, quote.getVotes());
+        log.info("Quote with id = {} has votes = {}", quoteId, quote.getVotes());
     }
 
     /**
      * Setting vote id from quote model
      * Is needed to make connection between quote and its vote
-     *
-     * @param quoteId
-     * @param voteId
      */
     @Override
-    public void setVoteToQuote(Long quoteId, Long voteId) {
+    public void setVoteToQuote(QuoteVoteDto quoteVoteDto) {
+        Long voteId = quoteVoteDto.getVoteId();
+        Long quoteId = quoteVoteDto.getQuoteId();
         log.info("Set vote id = {} to quote id = {}", voteId, quoteId);
         Quote quote = findQuote(quoteId);
         Set<Long> newVotes = quote.getVotes();
         newVotes.add(quoteId);
         quote.setVotes(newVotes);
         quote = quotesRepository.save(quote);
-        log.info("Quote with id = {} has sunh votes = {}", quoteId, quote.getVotes());
+        log.info("Quote with id = {} has such votes = {}", quoteId, quote.getVotes());
     }
 
     /**
@@ -223,13 +218,14 @@ public class QuoteServiceImpl implements QuoteService {
                             Long[].class);
             Long[] list = response.getBody();
             List<QuoteDto> quoteList = new ArrayList<>();
-            for (Long id :
-                    list) {
-                quoteList.add(quoteMapper.toQuoteDto(findQuote(id)));
 
+            if (list != null) {
+                for (Long id : list) {
+                    quoteList.add(quoteMapper.toQuoteDto(findQuote(id)));
+                }
+                return quoteList;
             }
-            return quoteList;
-
+            throw new NoSuchEntityException("There is no quotes");
         } catch (HttpClientErrorException e) {
             throw new UserDataBaseException("Exception in vote base");
         }
@@ -237,9 +233,6 @@ public class QuoteServiceImpl implements QuoteService {
 
     /**
      * Checking the correct authority of quotes
-     *
-     * @param userId
-     * @param quote
      */
     private void checkAuthority(Long userId, Quote quote) {
         if (!Objects.equals(quote.getUserAccountId(), userId)) {
@@ -247,10 +240,7 @@ public class QuoteServiceImpl implements QuoteService {
         }
     }
 
-
-
     /**
-     *
      * @return URL to user service
      */
     private String getUserHost() {
@@ -258,7 +248,6 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
     /**
-     *
      * @return URL to vote service
      */
     private String getVoteHost() {
