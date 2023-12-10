@@ -31,7 +31,6 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgumentException(IllegalArgumentException illegalArgumentException) {
@@ -40,7 +39,4 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .build();
     }
-
-
-
 }

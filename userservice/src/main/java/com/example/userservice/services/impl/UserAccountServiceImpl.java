@@ -1,8 +1,10 @@
 package com.example.userservice.services.impl;
 
 
+import com.example.userservice.model.dto.QuoteUserDto;
 import com.example.userservice.model.dto.UserDto;
 import com.example.userservice.model.dto.UserRegistrationDto;
+import com.example.userservice.model.dto.VoteUserDto;
 import com.example.userservice.model.exceptions.NoSuchEntityException;
 import com.example.userservice.model.entity.UserAccount;
 import com.example.userservice.model.mapper.UserMapper;
@@ -29,7 +31,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public UserDto createUser(UserRegistrationDto userRegistrationDto) {
         String email = userRegistrationDto.getEmail();
-        if (!userAccountRepository.findUserAccountByEmail(email).isEmpty()) {
+        if (userAccountRepository.findUserAccountByEmail(email).isPresent()) {
             throw new IllegalArgumentException("This email is registered");
         }
         String name = userRegistrationDto.getName();
@@ -53,7 +55,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     /**
      * Is searching for user in repository
-     * @param userId
+     *
      * @return user model or throws exception (if there is not such user)
      */
     private UserAccount findUserAccount(Long userId) {
@@ -65,71 +67,63 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     /**
      * Setting quote id to user model. Is needed to make connection between quote and its author
-     * @param userId
-     * @param quoteId
-     * @return String of user representation. Could throw an exception if the user does not exist
+     *
      */
     @Override
-    public void setQuotes(Long userId, Long quoteId) {
-        log.info("Set quote id = {} to user id = {}", quoteId, userId);
-        UserAccount userAccount = findUserAccount(userId);
+    public void setQuotes(QuoteUserDto quoteUserDto) {
+        log.info("Set quote id = {} to user id = {}", quoteUserDto.getQuoteId(), quoteUserDto.getUserId());
+        UserAccount userAccount = findUserAccount(quoteUserDto.getUserId());
         Set<Long> newQuotes = userAccount.getQuotes();
-        newQuotes.add(quoteId);
+        newQuotes.add(quoteUserDto.getQuoteId());
         userAccount.setQuotes(newQuotes);
         userAccount = userAccountRepository.save(userAccount);
-        log.info("User wih id {} has such quotes: {}", userId, userAccount.getQuotes());
+        log.info("User wih id {} has such quotes: {}", quoteUserDto.getUserId(), userAccount.getQuotes());
     }
+
     /**
      * Deleting quote id from user model(if the quote was deleted). Is needed to make connection between quote and its author
      * Could throw an exception if the user does not exist
-     * @param userId
-     * @param quoteId
      */
     @Override
-    public void deleteQuoteFromUser(Long userId, Long quoteId) {
-        log.info("Delete quote id = {} from user id = {}", quoteId, userId);
-        UserAccount userAccount = findUserAccount(userId);
+    public void deleteQuoteFromUser(QuoteUserDto quoteUserDto) {
+        log.info("Delete quote id = {} from user id = {}", quoteUserDto.getQuoteId(), quoteUserDto.getUserId());
+        UserAccount userAccount = findUserAccount(quoteUserDto.getUserId());
         Set<Long> newQuotes = userAccount.getQuotes();
-        newQuotes.remove(quoteId);
+        newQuotes.remove(quoteUserDto.getQuoteId());
         userAccount.setQuotes(newQuotes);
         userAccount = userAccountRepository.save(userAccount);
-        log.info("User wih id {} has such quotes: {}", userId, userAccount.getQuotes());
+        log.info("User wih id {} has such quotes: {}", quoteUserDto.getUserId(), userAccount.getQuotes());
     }
+
     /**
      * Setting vote id to user model
      * Is needed to make connection between vote and its author
      * Could throw an exception if the user does not exist
-     * @param userId
-     * @param voteId
      */
     @Override
-    public void setVoteToUser(Long userId, Long voteId) {
-        log.info("Set vote id = {} to user id = {}", voteId, userId);
-        UserAccount userAccount = findUserAccount(userId);
+    public void setVoteToUser(VoteUserDto voteUserDto) {
+        log.info("Set vote id = {} to user id = {}", voteUserDto.getVoteId(), voteUserDto.getUserId());
+        UserAccount userAccount = findUserAccount(voteUserDto.getUserId());
         Set<Long> newVotes = userAccount.getVotes();
-        newVotes.add(voteId);
+        newVotes.add(voteUserDto.getVoteId());
         userAccount.setVotes(newVotes);
         userAccount = userAccountRepository.save(userAccount);
-        log.info("User wih id {} has such votes: {}", userId, userAccount.getVotes());
+        log.info("User wih id {} has such votes: {}", voteUserDto.getUserId(), userAccount.getVotes());
     }
 
     /**
      * Deleting vote id from user model(if the vote was deleted - that happens when the grade is changing)
      * Is needed to make connection between vote and its author
      * Could throw an exception if the user does not exist
-     * @param userId
-     * @param voteId
      */
     @Override
-    public void deleteVoteFromUser(Long userId, Long voteId) {
-        log.info("Delete vote id = {} from user id = {}", voteId, userId);
-        UserAccount userAccount = findUserAccount(userId);
+    public void deleteVoteFromUser(VoteUserDto voteUserDto) {
+        log.info("Delete vote id = {} from user id = {}", voteUserDto.getVoteId(), voteUserDto.getUserId());
+        UserAccount userAccount = findUserAccount(voteUserDto.getUserId());
         Set<Long> newVotes = userAccount.getVotes();
-        newVotes.remove(voteId);
+        newVotes.remove(voteUserDto.getVoteId());
         userAccount.setVotes(newVotes);
         userAccount = userAccountRepository.save(userAccount);
-        log.info("User wih id {} has such votes: {}", userId, userAccount.getVotes());
+        log.info("User wih id {} has such votes: {}", voteUserDto.getUserId(), userAccount.getVotes());
     }
-
-
 }

@@ -59,9 +59,7 @@ public class TestUserController {
         userObject.put("name", NAME);
         userObject.put("email", EMAIL);
         userObject.put("password", PASSWORD);
-
     }
-
 
     @Test
     public void testAddUser() {
@@ -104,7 +102,6 @@ public class TestUserController {
 
     @Test
     public void testAddUserWithError() {
-
         String url = URL + PORT + ADDRESS;
 
         JSONObject userObjectError = new JSONObject();
@@ -163,7 +160,5 @@ public class TestUserController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

@@ -16,15 +16,11 @@ public class Vote {
     @Id
     @GeneratedValue
     private Long id;
-
     private int grade;
-
     private Long quote;
-
     private Long author;
     @Column(name = "date_of_creation")
     private LocalDate createdAt;
-
     public Vote() {
     }
 

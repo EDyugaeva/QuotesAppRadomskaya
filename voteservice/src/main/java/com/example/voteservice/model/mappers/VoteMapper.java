@@ -10,7 +10,6 @@ import java.time.Instant;
 @Mapper(componentModel = "spring")
 public interface VoteMapper {
     VoteDto toVoteDto(Vote vote);
-
     default Timestamp map(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
     }

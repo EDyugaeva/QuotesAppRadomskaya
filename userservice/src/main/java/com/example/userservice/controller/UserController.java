@@ -24,10 +24,8 @@ public class UserController {
         if (userRegistrationDto.getPassword() == null || userRegistrationDto.getEmail() == null || userRegistrationDto.getName() == null) {
             throw new IllegalArgumentException("Exception in creating user");
         }
-        log.info("Create user with dto", userRegistrationDto);
-
+        log.info("Create user with dto {}", userRegistrationDto);
         return userAccountService.createUser(userRegistrationDto);
-
     }
 
     @GetMapping({"{id}"})
@@ -35,6 +33,4 @@ public class UserController {
         log.info("Getting user with id = {}", id);
         return userAccountService.getUser(id);
     }
-
-
 }

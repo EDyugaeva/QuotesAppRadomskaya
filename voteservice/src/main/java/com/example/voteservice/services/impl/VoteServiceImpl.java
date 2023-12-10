@@ -1,38 +1,37 @@
 package com.example.voteservice.services.impl;
 
 
-import com.example.voteservice.model.dto.VoteDto;
-import com.example.voteservice.model.dto.VoteResultDto;
-import com.example.voteservice.model.exception.NoSuchEntityException;
-import com.example.voteservice.model.exception.DataBaseException;
+import com.example.voteservice.model.dto.*;
 import com.example.voteservice.model.entity.Vote;
+import com.example.voteservice.model.exception.DataBaseException;
+import com.example.voteservice.model.exception.NoSuchEntityException;
 import com.example.voteservice.model.mappers.VoteMapper;
 import com.example.voteservice.model.mappers.VoteResultMapper;
 import com.example.voteservice.repository.VoteRepository;
 import com.example.voteservice.services.VoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
 @Slf4j
 public class VoteServiceImpl implements VoteService {
-
-    private RestTemplate restTemplate;
-
+    private final RestTemplate restTemplate;
     private final VoteRepository voteRepository;
-
     private final VoteResultMapper voteResultMapper;
-
     private final VoteMapper voteMapper;
+    private static final String DELETE_VOTE = "deleteVote";
+    private static final String SET_VOTE = "setVote";
 
     @Value("${host.userservice}")
     private String USER_HOST;
@@ -40,10 +39,10 @@ public class VoteServiceImpl implements VoteService {
     @Value("${host.quoteservice}")
     private String QUOTE_HOST;
 
-    public VoteServiceImpl(VoteRepository voteRepository, RestTemplateBuilder builder,
+    public VoteServiceImpl(VoteRepository voteRepository, RestTemplate restTemplate,
                            VoteResultMapper voteResultMapper, VoteMapper voteMapper) {
         this.voteRepository = voteRepository;
-        this.restTemplate = builder.build();
+        this.restTemplate = restTemplate;
         this.voteResultMapper = voteResultMapper;
         this.voteMapper = voteMapper;
     }
@@ -51,16 +50,16 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Make a vote with grade = 1 (up grade)
      *
-     * @param quoteId
-     * @param userId  - author of the vot (NOT quote)
      * @return vote dto
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public VoteResultDto upVote(Long quoteId, Long userId) {
+    public VoteResultDto upVote(UserQuoteDto userQuoteDto) {
+        Long userId = userQuoteDto.getUserId();
+        Long quoteId = userQuoteDto.getQuoteId();
+
         int grade = 1;
         Vote vote = checkIfVoteIsMade(quoteId, userId, grade);
-        ;
 
         vote.setAuthor(userId);
         vote.setQuote(quoteId);
@@ -77,13 +76,14 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Make a vote with grade = -1 (down grade)
      *
-     * @param quoteId
-     * @param userId  - author of the vot (NOT quote)
      * @return vote dto
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public VoteResultDto downVote(Long quoteId, Long userId) {
+    public VoteResultDto downVote(UserQuoteDto userQuoteDto) {
+        Long userId = userQuoteDto.getUserId();
+        Long quoteId = userQuoteDto.getQuoteId();
+
         int grade = -1;
 
         Vote vote = checkIfVoteIsMade(quoteId, userId, grade);
@@ -98,13 +98,11 @@ public class VoteServiceImpl implements VoteService {
         int result = getResultVoteFromQuoteId(quoteId);
 
         return voteResultMapper.voteDto(vote, result);
-
     }
 
     /**
      * get result from quote voting
      *
-     * @param quoteId
      * @return vote dto (result frade)
      */
     @Override
@@ -118,7 +116,6 @@ public class VoteServiceImpl implements VoteService {
     /**
      * get all quotes to quote
      *
-     * @param quoteId
      * @return vote dto
      */
     @Override
@@ -136,14 +133,10 @@ public class VoteServiceImpl implements VoteService {
         return listDto;
     }
 
-
     /**
      * Check not to give second vote to one user
      *
-     * @param quoteId
-     * @param userId
      * @param grade   +1 if up vote/ -1 if down vote
-     * @return
      */
     private Vote checkIfVoteIsMade(Long quoteId, Long userId, int grade) {
         Vote vote = voteRepository.getVoteBy(quoteId, userId).orElse(new Vote());
@@ -159,11 +152,6 @@ public class VoteServiceImpl implements VoteService {
         return new Vote();
     }
 
-    /**
-     * delete vote
-     *
-     * @param vote
-     */
     @Override
     public void deleteVote(Vote vote) {
         deleteVoteFromUserAndQuote(vote.getAuthor(), vote.getQuote(), vote);
@@ -173,18 +161,13 @@ public class VoteServiceImpl implements VoteService {
     /**
      * delete connection in quotes and users
      *
-     * @param userId
-     * @param quoteId
-     * @param vote
      */
     private void deleteVoteFromUserAndQuote(Long userId, Long quoteId, Vote vote) {
-        String urlUser = getUserHost() + "deleteVote?userId=" + userId + "&voteId=" + vote.getId();
-        String urlQuote = getQuoteHost() + "deleteVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
-
+        String urlUser = getUserHost() + DELETE_VOTE;
+        String urlQuote = getQuoteHost() + DELETE_VOTE;
         try {
-            restTemplate.put(urlUser, Void.class);
-            restTemplate.put(urlQuote, Void.class);
-
+            restTemplate.patchForObject(urlUser, new VoteUserDto(userId, vote.getId()), Void.class);
+            restTemplate.patchForObject(urlQuote, new QuoteVoteDto(quoteId, vote.getId()), Void.class);
         } catch (HttpClientErrorException e) {
             throw new DataBaseException("Exception in setting vote to user or quote");
         }
@@ -193,17 +176,14 @@ public class VoteServiceImpl implements VoteService {
     /**
      * set vote to quote and user
      *
-     * @param userId
-     * @param quoteId
-     * @param vote
      */
     private void setVoteToUserAndQuote(Long userId, Long quoteId, Vote vote) {
-        String urlUser = getUserHost() + "setVote?userId=" + userId + "&voteId=" + vote.getId();
-        String urlQuote = getQuoteHost() + "setVote?quoteId=" + quoteId + "&voteId=" + vote.getId();
+        String urlUser = getUserHost() + SET_VOTE;
+        String urlQuote = getQuoteHost() + SET_VOTE;
 
         try {
-            restTemplate.put(urlUser, String.class);
-            restTemplate.put(urlQuote, String.class);
+            restTemplate.patchForObject(urlUser, new VoteUserDto(userId, vote.getId()), String.class);
+            restTemplate.patchForObject(urlQuote, new QuoteVoteDto(quoteId, vote.getId()),String.class);
         } catch (HttpClientErrorException e) {
             throw new DataBaseException("Exception in setting vote to user or quote");
         }
@@ -212,7 +192,6 @@ public class VoteServiceImpl implements VoteService {
     /**
      * get result grase to quote
      *
-     * @param quoteId
      * @return int result
      */
     public int getResultVoteFromQuoteId(long quoteId) {
@@ -250,7 +229,6 @@ public class VoteServiceImpl implements VoteService {
      * X -> date (since creating a quote)
      * Y - sum amount of grades
      *
-     * @param quoteId
      * @return Map<String, Integer>
      */
     @Override
@@ -273,8 +251,6 @@ public class VoteServiceImpl implements VoteService {
 
     /**
      * check if list of quotes is not empty
-     *
-     * @param longList
      */
     private void checkingExistingVotes(List<Long> longList) {
         if (longList.isEmpty()) {
@@ -283,7 +259,6 @@ public class VoteServiceImpl implements VoteService {
     }
 
     /**
-     *
      * @return URL to user service
      */
     private String getUserHost() {
@@ -291,12 +266,9 @@ public class VoteServiceImpl implements VoteService {
     }
 
     /**
-     *
      * @return URL to quote service
      */
     private String getQuoteHost() {
         return "http://" + QUOTE_HOST + ":8082/service/";
     }
-
-
 }

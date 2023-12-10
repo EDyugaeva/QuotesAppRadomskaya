@@ -1,13 +1,12 @@
-package com.example.userservice;
+package com.example.voteservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserserviceApplicationTests {
+class VoteServiceApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }
